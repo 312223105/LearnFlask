@@ -10,10 +10,6 @@ from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
 @main.route('/employee_manage', methods=['GET', 'POST'])
 def employee_manage():
-    name = None
-    phone = None
-    status = 1
-    others = None
     form = EmployeeForm()
     if form.validate_on_submit():
         name = form.name.data
@@ -25,8 +21,8 @@ def employee_manage():
         db.session.add(obj)
         try:
             db.session.commit()
-            flash("<p>添加新员工成功：</p><p> 姓名： %r </p><p> 编号：%r </p><p> 电话：%r </p><p> 状态： %r </p><p> 其他：%r</p>" \
-                  % (name, code, phone, status, others))
+            flash("<p>添加新员工成功：</p><p> 姓名： %r </p><p> 编号：%r </p><p> 电话：%r </p><p> 状态： %r </p><p>  "
+                  "其他：%r</p>" % (name, code, phone, status, others))
         except IntegrityError or InvalidRequestError as e:
             flash("<h4>添加数据失败:</h4><p>%r</p>" % str(e))
             db.session.rollback()
@@ -43,8 +39,8 @@ def employee_edit(e_id):
     employee = Employee.query.filter_by(id=e_id).first()
     if request.method == "POST":
         new_code = request.form.get("code")
-        q = Employee.query.filter_by(code=new_code).first()
-        if new_code != employee.code and q is not None:
+        result = Employee.query.filter_by(code=new_code).first()
+        if new_code != employee.code and result is not None:
             flash("员工编码（%s）已存在，请重新输入。" % request.form.get("code"))
             return redirect(url_for("main.employee_edit", e_id=e_id))
         employee.phone = request.form.get("phone")
@@ -71,8 +67,8 @@ def program_manage():
         db.session.add(p)
         try:
             db.session.commit()
-            flash("<p>添加新消费项目成功：</p><p>项目名称：%r</p><p>项目单价：%r</p><p>排序：%r</p><p>状态：%r</p>" \
-              % (p.name, p.price, p.sort_num, p.status))
+            flash("<p>添加新消费项目成功：</p><p>项目名称：%r</p><p>项目单价：%r</p><p>排序：%r</p><p>状态：%r</p>" %
+                  (p.name, p.price, p.sort_num, p.status))
         except IntegrityError or InvalidRequestError as e:
             flash("<h4>添加数据失败:</h4><p>%r</p>" % e)
             db.session.rollback()
@@ -104,7 +100,7 @@ def add_vip():
     if add_vip_form.validate_on_submit():
         if VIP.query.filter_by(card_id=add_vip_form.card_id.data).first() is not None:
             flash("卡号已存在，请重新输入！")
-            return  redirect(url_for("main.add_vip"))
+            return redirect(url_for("main.add_vip"))
         obj = VIP()
         obj.card_id = add_vip_form.card_id.data
         obj.name = add_vip_form.name.data
