@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="container">
+<h1></h1>
+
+<form method="post" action="" class="form-horizontal col-sm-offset-1 col-sm-10">
+    <div class="input-group col-sm-3">
+        <input type="text" class="form-control" name="card_id_input" id="card_id_input" placeholder="会员卡号">
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="search_vip">查找</button>
+        </span>
+    </div>
+    <div class="panel panel-default" style="margin-top: 10px">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-3">
+                    <label for="vip_name">会员姓名：</label>
+                    <span id="vip_name">无</span>
+                </div>
+                <div class="col-sm-2">
+                    <label for="vip_phone">电话：</label>
+                    <span id="vip_phone">无</span>
+                </div>
+                <div class="col-sm-2">
+                    <label for="last_consume">上次消费：</label>
+                    <span id="last_consume">无</span>
+                </div>
+                <div class="col-sm-3">
+                    <label for="vip_create_time">办卡时间：</label>
+                    <span id="vip_create_time">无</span>
+                </div>
+
+
+            </div>
+            <br>
+            <div class="row">
+
+                <div class="col-sm-2">
+                    <label for="vip_money">余额：</label>
+                    <code><span id="vip_money" style="font-size: 20pt">0.0</span></code>
+                    <span>元</span>
+                </div>
+                <div class="col-sm-4 form-group">
+                    <label for="money" class="col-sm-4 control-label">充值金额</label>
+                    <div class="col-sm-7">
+                        <input id="money" class="form-control" name="money">
+                    </div>
+                </div>
+                <div class="col-sm-4 form-group">
+                    <label for="amount" class="col-sm-4 control-label">实收金额</label>
+                    <div class="col-sm-7">
+                        <input id="amount" class="form-control" name="amount">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">次数充值</div>
+        <div class="panel-body">
+            <table class="table table-responsive" id="tab">
+                <thead>
+                    <tr>
+                        <th width="10%">序号</th>
+                        <th width="25%">项目名称</th>
+                        <th width="15%">可用次数</th>
+                        <th width="20%">充值</th>
+                        <th width="20%">金额</th>
+                        <th width="10%">操作</th></tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+            <div><input type="button" id="addbtn" value="增加"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-offset-1 col-sm-2">
+            <label for="total">总计：</label>
+            <code style="font-size: 20px"><span id="total" >0.0</span></code><span>元</span>
+        </div>
+        <div class="col-sm-6">
+            <label for="proposer" class="col-sm-7 control-label">记录人</label>
+            <div class="col-sm-5">
+                <select class="form-control col-sm-2" name="proposer" id="proposer">
+                    {% for e in employees %}
+                    <option>{{ e.name }} | {{ e.code }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-offset-1 col-sm-2">
+            <input type="submit" class="form-control" value="提交">
+        </div>
+    </div>
+</form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+var employees = [];
+var programs = [];
+$(document).ready(function() {
+    //<tr/>居中
+    $("#tab tr").attr("align", "center");
+
+    $("#money").bind('input propertychange', function() {
+        $("#amount").val($("#money").val());
+        update_total();
+    });
+    $("#amount").bind('input propertychange', function() {
+        update_total();
+    });
+    getdata();
+    update_total();
+
+    $("#search_vip").click(function () {
+        var card_id = "" + $("#card_id_input").val();
+        console.log(card_id);
+
+        if (card_id.length > 0) {
+
+            $.ajax({
+                type: "GET",
+                url: "api/vip/" + card_id,
+                dataType: "json",
+                success: function (data) {
+                    if (data.data != null) {
+                        console.log(data.data);
+                        $("#vip_name").html(data.data.name);
+                        $("#vip_phone").html(data.data.phone);
+                        $("#vip_money").html(data.data.money);
+                        $("#vip_create_time").html(data.data.create_time.substr(0,10));
+                        $("#vip_cardid").val(data.data.card_id);
+                        $("#tab tbody tr").remove();
+                        var index = 1;
+                        for(var i = 0;i<data.data.plans.length; i++){
+                            var plan = data.data.plans[i];
+                            var new_html = "<tr id=\""+index+"\"><td></td>"
+                                    +"<td><select class=\"form-control\" name=\"program"+index +"\"><option>" + plan.program_name+" | "+plan.program_price + "</option></select></td>"
+                                    + "<td><span>" + plan.rest_count + "</span></td>"
+                                    + "<td><input class=\"form-control\" type=\"number\" id=\"recharge_count" + index + "\" name=\"recharge_count" + index + "\" value=0>"
+                                    + "<td><input class=\"form-control money-input\" type=\"text\" id=\"recharge_money" + index + "\" name=\"recharge_money" + index + "\" value=0>"
+                                    + "<td></td></tr>";
+                            $("#tab tbody").append(new_html);
+                            index++;
+                        }
+                        bind_money_input();
+                    }
+                    else {
+                        alert("卡号：" + card_id + "不存在，请重新输入");
+                    }
+                }
+            });
+        }
+    });
+    //增加<tr/>
+    $("#addbtn").click(function () {
+        var _len = $("#tab tbody tr").length + 1;
+        if(_len <= 1) return;
+        var select_programs_html = "";
+        for (var i = 0; i < programs.length; i++) {
+            select_programs_html += "<option>" + programs[i].name+" | "+programs[i].price+"</option>";
+        }
+        var new_html = "<tr id=\""+_len+"\"><td></td>"
+                +"<td><select class=\"form-control\" name=\"program"+_len+"\">" + select_programs_html + "</select></td>"
+                + "<td><span>无</span></td>"
+                + "<td><input class=\"form-control\" type=\"number\" id=\"recharge_count" + _len + "\" name=\"recharge_count" + _len + "\" value=0>"
+                + "<td><input class=\"form-control money-input\" type=\"text\" id=\"recharge_money" + _len + "\" name=\"recharge_money" + _len + "\" value=0>"
+                + "<td><a href=\"#\" onclick=\"deltr(" + _len + ")\">删除</a></td>"
+                + "</tr>";
+        $("#tab tbody").append(new_html);
+        bind_money_input();
+    });
+});
+//删除<tr/>
+var deltr = function (index) {
+    var _len = $("#tab tbody tr").length;
+
+    $("tr[id='" + index + "']").remove();//删除当前行
+    var select_programs_html = "";
+    for (var i = 0; i < programs.length; i++) {
+        select_programs_html += "<option>" + programs[i].name+" | "+programs[i].price+"</option>";
+    }
+    for (var i = index + 1, j = _len; i <= j; i++) {
+        var program = $("#program" + i).val();
+        var count = $("#recharge_count" + i).val();
+        var recharge_money = $("#recharge_money" + i).val();
+        var new_html = "<tr id=\""+(i - 1)+"\"><td></td>"
+            +"<td><select class=\"form-control\" name=\"program"+_len+"\"value=\""+program+"\">" + select_programs_html + "</select></td>"
+            + "<td><span>无</span></td>"
+            + "<td><input class=\"form-control\" type=\"number\" id=\"recharge_count" + (i - 1) + "\" name=\"recharge_count" + (i - 1) + "\" value="+count+"></td>"
+            + "<td><input class=\"form-control money-input\" type=\"text\" id=\"recharge_money" + (i - 1) + "\" name=\"recharge_money" + (i - 1) + "\" value="+recharge_money+"></td>"
+            + "<td><a href=\"#\" onclick=\"deltr(" + (i - 1) + ")\">删除</a></td>"
+            + "</tr>";
+        $("tr[id=\'" + i + "\']").replaceWith(new_html);
+    }
+    bind_money_input();
+    update_total();
+};
+
+
+function getdata() {
+        $.ajax({
+            type: "GET",
+            url: "api/employees",
+            dataType: "json",
+            success: function (data) {
+                employees = data.data
+            }
+        })
+        $.ajax({
+            type: "GET",
+            url: "api/programs",
+            dataType: "json",
+            success: function (data) {
+                programs = data.data
+            }
+        })
+    };
+
+function bind_money_input(){
+    var temp = $(".money-input");
+    temp.bind('input propertychange', function() {
+            update_total();
+    })
+}
+
+function update_total(){
+    var amount = parseFloat($("#amount").val());
+    var a = $(".money-input");
+    var total = amount;
+    for(var i =0; i < a.length; i++){
+        total += parseFloat(a[i].value);
+    }
+    console.log(total);
+    $("#total").html(total);
+}
+</script>
+{% endblock %}

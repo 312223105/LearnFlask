@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block page_content %}
+    <h1 style="margin-top: 2em;"></h1>
+    <div class="col-sm-offset-1 col-sm-10">
+        {% if program %}
+            <form role="form" method="post" class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-sm-3">项目名称</label>
+                <div class="col-sm-6">
+                    <input class="form-control" type="text" readonly value="{{ program.name }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">创建时间</label>
+                <div class="col-sm-6">
+                    <input class="form-control" type="text" readonly value="{{ program.create_time.strftime("%Y-%m-%d %H:%M:%S") }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">项目单价</label>
+                <div class="col-sm-6">
+                    <input class="form-control" type="number" value="{{ program.price }}" name="price" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">排序</label>
+                <div class="col-sm-6">
+                    <input class="form-control" type="number" value="{{ program.sort_num }}" name="sort_num" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">状态</label>
+                <div class="col-sm-6">
+                    <select name="status" class="form-control" >
+                        <option value="1" {% if program.status is equalto 1 %}selected{% endif %}>可见</option>
+                        <option value="2" {% if program.status is not equalto 1 %}selected{% endif %}>不可见</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-offset-3 col-sm-2">
+                    <a href="{{ url_for(".program_manage") }}" class="btn btn-default">返回</a>
+                </div>
+                <div class="col-sm-offset-2 col-sm-2">
+                    <input type="submit" value="提交" class="form-control">
+                </div>
+            </div>
+        </form>
+        {% else %}
+            <h3 style="color:red;">未找到项目信息，请重试！</h3>
+        {% endif %}
+    </div>
+{% endblock %}

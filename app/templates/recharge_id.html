@@ -1,0 +1,27 @@
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% extends "base.html" %}
+
+{% block page_content %}
+    <div class="container">
+{% if vip %}
+<div>
+<table class="table table-bordered">
+    <tr>
+        <td>{{ vip.card_id }}</td>
+        <td>{{ vip.name }}</td>
+        <td>{{ vip.phone }}</td>
+    </tr>
+    <tr>
+        <td>{{ vip.money }}</td>
+        <td>{{ vip.create_time }}</td>
+        <td></td>
+    </tr>
+</table>
+</div>
+{% endif %}
+{% if form %}{{ wtf.quick_form(form) }}{% endif %}
+<div>
+</div>
+</div>
+{% endblock %}

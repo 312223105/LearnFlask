@@ -1,0 +1,219 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="col-sm-offset-1 col-md-10" style="margin-bottom: 80px">
+    <form class="form-horizontal" method="POST" role="role">
+    {{ add_vip_form.hidden_tag() }}
+    <div class="panel panel-default">
+        <div class="panel-heading">会员信息</div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group required">
+                        {{ add_vip_form.card_id.label(class="col-sm-3 control-label") }}
+                        <div class="col-sm-9">{{ add_vip_form.card_id(class=" form-control", required=True) }} </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group required">
+                        {{ add_vip_form.name.label(class="col-sm-2 control-label") }}
+                        <div class="col-sm-10">{{ add_vip_form.name(class=" form-control", required=True) }} </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        {{ add_vip_form.sex.label(class="col-sm-3 control-label") }}
+                        <div class="col-sm-9">{{ add_vip_form.sex(class=" form-control") }} </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        {{ add_vip_form.phone.label(class="col-sm-2 control-label") }}
+                        <div class="col-sm-10">{{ add_vip_form.phone(class=" form-control") }} </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        {{ add_vip_form.proposer.label(class="col-sm-3 control-label") }}
+                        <div class="col-sm-9">{{ add_vip_form.proposer(class=" form-control") }} </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">充值计次项目</div>
+        <div class="panel-body">
+            <table class="table table-bordered" id="tab">
+                <thead><tr>
+                <th width="10%">序号</th>
+                <th width="35%">消费项目</th>
+                <th width="20%">次数</th>
+                <th width="25%">收费金额</th>
+                <th width="10%">操作</th></tr></thead>
+                <tbody>
+                    <tr id="1" align="center">
+                        <th>1</th>
+                        <td><select name="program1" class="form-control">
+                            {% for p in programs %}
+                                <option>{{ p.name}} | {{ p.price }}</option>
+                            {% endfor %}
+                        </select></td>
+                        <td><input type="number" name="count1" class="form-control" value="1"> </td>
+                        <td><input type="text" name="amount1" value="20.0" id="amount1" class="form-control money-input"></td>
+                        <td><a href="#" onclick="deltr(1)">删除</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        <div class="row">
+            <div class="col-sm-offset-1 col-sm-2">
+                <input type="button" id="addbtn" value="增加" class="form-control">
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">充值卡内金额</div>
+        <div class="panel-body">
+            <div class="form-group">
+                {{ add_vip_form.money.label(class="col-sm-2 control-label") }}
+                <div class="col-sm-10">{{ add_vip_form.money(class=" form-control") }} </div>
+            </div>
+            <div class="form-group">
+                {{ add_vip_form.money_actully.label(class="col-sm-2 control-label") }}
+                <div class="col-sm-10">{{ add_vip_form.money_actully(class=" form-control") }} </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="col-sm-6">
+            <label for="total">总计：</label>
+            <code style="font-size: 20px"><span id="total" >0.0</span></code><span>元</span>
+        </div>
+        <div class="col-sm-offset-3 col-sm-3">
+            {{ add_vip_form.submit(class="btn btn-default btn-block") }}
+        </div>
+    </div>
+
+    </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+var programs = [];
+$(document).ready(function(){
+    //<tr/>居中
+    $("#tab tr").attr("align","center");
+    $("#money_actully").bind('input propertychange', function() {
+        update_total();
+    });
+    $("#amount1").bind('input propertychange', function() {
+        update_total();
+    });
+    $("#money").bind('input propertychange', function() {
+        $("#money_actully").val($("#money").val());
+        update_total();
+    });
+
+    getdata();
+    update_total();
+    //增加<tr/>
+    $("#addbtn").click(function(){
+        var _len = $("#tab tbody tr").length + 1;
+        var select_programs_html = "";
+        for(var i=0; i < programs.length; i++)
+        {
+            select_programs_html += "<option>"+programs[i].name+" | "+programs[i].price+"</option>";
+        }
+
+        $("#tab tbody").append("<tr id="+_len+" align=\"center\">"
+            +"<th>"+_len+"</th>"
+            +"<td><select name=\"program"+_len+"\" id=\"program"+_len
+                +"\"class=\"form-control\">"+select_programs_html+"</select>"+"</td>"
+            +"<td><input type=\"number\" name=\"count"+_len+"\" id=\"count"+_len
+                +"\" value=\"1\" class=\"form-control\"></td>"
+            +"<td><input type=\"text\" name=\"amount"+_len+"\" id=\"amount"+_len
+                +"\" value=\"20.0\" class=\"form-control money-input\"></td>"
+            +"<td><a href=\"#\" onclick=\"deltr("+_len+")\">删除</a></td>"
+            +"</tr>");
+
+        $("#amount"+_len).bind('input propertychange', function() {
+            update_total();
+        });
+        update_total();
+    })
+});
+
+//删除<tr/>
+var deltr =function(index){
+   var _len = $("#tab tbody tr").length;
+
+   $("tr[id='"+index+"']").remove();//删除当前行
+    var select_programs_html = "";
+    for(var i=0; i < programs.length; i++)
+    {
+        select_programs_html += "<option>"+programs[i].name+" | "+programs[i].price+"</option>";
+    }
+   for(var i=index+1,j=_len;i<=j;i++)
+   {
+       var program = $("#program"+i).val();
+       var count = $("#count"+i).val();
+       var amount = $("#amount"+i).val();
+       var new_html = "<tr id="+(i-1)+" align=\"center\">"
+            +"<th>"+(i-1)+"</th>"
+            +"<td><select name=\"program"+(i-1)+"\" id=\"program"+(i-1)
+               +"\" value=\""+program+"\" class=\"form-control\">"+select_programs_html+"</select>"+"</td>"
+            +"<td><input type=\"number\" name=\"count"+(i-1)+"\" id=\"count"+(i-1)
+               +"\" value=\""+count+"\"class=\"form-control\"></td>"
+            +"<td><input type=\"text\" name=\"amount"+(i-1)+"\" id=\"amount"+(i-1)
+               +"\" value=\""+amount+"\" class=\"form-control money-input\"></td>"
+            +"<td><a href=\'#\' onclick=\'deltr("+(i-1)+")\'>删除</a></td>"
+            +"</tr>";
+       console.log(new_html);
+       $("tr[id=\'"+i+"\']")
+           .replaceWith(new_html);
+   }
+    update_total();
+
+   };
+
+function getdata(){
+    $.ajax({
+        type:"GET",
+        url:"api/employees",
+        dataType:"json",
+        success: function(data){
+            employees = data.data
+        }
+    })
+    $.ajax({
+        type:"GET",
+        url:"api/programs",
+        dataType:"json",
+        success: function(data){
+            programs = data.data
+        }
+    })
+}
+function update_total(){
+    var money_actully = parseFloat($("#money_actully").val());
+    var a = $(".money-input");
+    var total = 0.0;
+    for(var i =0; i < a.length; i++){
+        total += parseFloat(a[i].value);
+    }
+    $("#total").html(money_actully + total);
+}
+</script>
+{% endblock %}

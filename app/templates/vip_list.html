@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="container">
+    <table class="table table-bordered">
+    <thead>
+    <tr>
+        <th width="5%">#</th>
+        <th width="6%">卡号</th>
+        <th width="9%">会员姓名</th>
+        <th width="5%">性别</th>
+        <th width="12%">电话</th>
+        <th width="20%">办卡时间</th>
+        <th width="10%">余额</th>
+        <th width="15%">余次</th>
+        <th>办卡人</th>
+    </tr>
+    </thead>
+    <tbody>
+     {% if vips %}
+    {% for v in vips %}
+        <tr>
+            <th>{{ loop.index }}</th>
+            <td>{{ v.card_id }}</td>
+            <td>{{ v.name }}</td>
+            <td>{% if v.sex is equalto 1 %}男{% else %}女{% endif %}</td>
+            <td>{{ v.phone }}</td>
+            <td>{{ v.create_time.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+            <td>{{ v.money }}</td>
+            <td>{% for p in v.plans %}<p>{{ p.program.name }}/{{ p.count }}</p>{% endfor %}</td>
+            <td>{{ v.proposer.name }} | {{ v.proposer.code }}</td>
+        </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+    </table>
+</div>
+{% endblock %}

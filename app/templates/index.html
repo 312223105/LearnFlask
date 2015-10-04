@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+    <div class="container">
+        <div class="col-md-{% if width %}{{ width }}{% else %}9{% endif %}">
+            {% import "bootstrap/wtf.html" as wtf %}
+            {% if form %}{{ wtf.quick_form(form) }}{% endif %}
+        </div>
+    </div>
+
+{% endblock %}

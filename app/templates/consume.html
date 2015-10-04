@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+{% block page_content %}
+<div class="col-sm-offset-1 col-md-10" style="margin-bottom: 80px">
+  <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#vip_consume" aria-controls="vip_consume" role="tab" data-toggle="tab">会员消费</a></li>
+        <li role="presentation"><a href="#once_consume" aria-controls="once_consume" role="tab" data-toggle="tab">散客消费</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="vip_consume">
+            <p></p>
+            <form role="form" method="POST" class="form-horizontal">
+                <div class="input-group col-sm-2">
+                    <input type="text" class="form-control" id="card_id_input" placeholder="会员卡号">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" id="search_vip">查找</button>
+                    </span>
+                </div><!-- /input-group -->
+
+                <div class="panel panel-default" style="margin-top: 10px">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <label for="vip_name">会员姓名：</label>
+                                <span id="vip_name">无</span>
+                            </div>
+                            <div class="col-sm-3">
+                                <label for="vip_phone">电话：</label>
+                                <span id="vip_phone">无</span>
+                            </div>
+                            <div class="col-sm-2">
+                                <label for="vip_money">余额：</label>
+                                <span id="vip_money">无</span>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="vip_create_time">办卡时间：</label>
+                                <span id="vip_create_time">无</span>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="last_consume">上次消费：</label>
+                                <span id="last_consume">无</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading"><strong>普通消费</strong></div>
+                    <div class="panel-body">
+                        <table class="table table-bordered" id="vip-tab">
+                            <thead><tr>
+                                <th width="10%">序号</th><th width="25%">消费项目</th><th width="10%">单价</th>
+                                <th width="25%">数量</th><th width="20%">员工</th><th width="10%">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr id="vip-1" align="center">
+                                <th>1</th>
+                                <td><select name="vip_program1" class="form-control" id="vip-program1">
+                                    {% for i in programs %}
+                                    <option>{{ i.name }} | {{ i.price }}</option>
+                                    {% endfor %}
+                                </select></td>
+                                <td><input type="text" name="vip_price1" value="{% if programs %}{{ programs[0].price }}{% else %}0.0{% endif %}" class="form-control" id="vip-price1"></td>
+                                <td><input type="number" name="vip_count1" class="form-control" value="1" id="vip-count1"> </td>
+                                <td><select name="vip_employee1" class="form-control" id="vip-employee1">
+                                    {% for i in employees %}
+                                    <option>{{ i.name }} | {{ i.code }}</option>
+                                    {% endfor %}
+                                </select></td>
+                                <td><a href="#" onclick="vip_deltr(1)">删除</a></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <input type="hidden" name="vip_cardid" id="vip_cardid">
+                        <input type="hidden" name="vip_normal_consume" value="true">
+                        <div class="col-sm-offset-1 col-sm-2">
+                            <input class="form-control" type="button" id="vip-addbtn" value="增加">
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">计次消费</div>
+                    <div class="panel-body">
+                        <table class="table table-responsive" id="count-consuming">
+                        <thead>
+                            <tr>
+                                <th width="15%">序号</th>
+                                <th width="30%">项目名称</th>
+                                <th width="25%">可用次数</th>
+                                <th width="30%">消费</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr><th colspan="4"><span><h4><strong>无计次项目</strong></h4></span></th> </tr>
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-offset-3 col-sm-3">
+
+                    </div>
+                    <div class="col-sm-offset-3 col-sm-2">
+                        <input type="submit" value="提交" class="form-control">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="once_consume">
+            <p></p>
+            <form role="form" method="POST" class="form-horizontal" name="once">
+                <table class="table table-bordered" id="tab">
+                    <thead>
+                        <tr>
+                            <th width="10%">序号</th>
+                            <th width="25%">消费项目</th>
+                            <th width="10%">单价</th>
+                            <th width="25%">数量</th>
+                            <th width="20%">员工</th>
+                            <th width="10%">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="1" align="center">
+                            <th>1</th>
+                            <td><select name="program1" class="form-control">
+                                {% for i in programs %}
+                                <option>{{ i.name }} | {{ i.price }}</option>
+                                {% endfor %}
+                            </select></td>
+                            <td><input type="text" name="price1" value="20.0" class="form-control"></td>
+                            <td><input type="number" name="count1" class="form-control" value="1"> </td>
+                            <td><select name="employee1" class="form-control">
+                                {% for i in employees %}
+                                <option>{{ i.name }} | {{ i.code }}</option>
+                                {% endfor %}
+                            </select></td>
+                            <td><a href="#" onclick="deltr(1)">删除</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <input type="hidden" name="once_consume" value="true">
+                <div class="row">
+                    <div class="col-sm-offset-1 col-sm-2">
+                        <input class="form-control" type="button" id="addbtn" value="增加">
+                    </div>
+                    <div class="col-sm-offset-6 col-sm-2">
+                        <input class="form-control" class="text-right" type="submit" value="提交">
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+var employees = [];
+var programs = [];
+$(document).ready(function(){
+    //<tr/>居中
+    $("#tab tr").attr("align","center");
+    getdata();
+    $("#search_vip").click(function(){
+        var card_id = ""+$("#card_id_input").val();
+        if(card_id.length > 0){
+            $.ajax({
+                type:"GET",
+                url:"api/vip/"+card_id,
+                dataType:"json",
+                success:function(data){
+                    if(data.data != null){
+                        console.log(data.data);
+                        $("#vip_name").html(data.data.name);
+                        $("#vip_phone").html(data.data.phone);
+                        $("#vip_money").html(data.data.money);
+                        $("#vip_create_time").html(data.data.create_time.substr(0,10));
+                        $("#vip_cardid").val(data.data.card_id);
+                        $("#count-consuming tbody tr").remove();
+                        var plans = data.data.plans;
+                        var html = "";
+                        for(var i=0; i<plans.length; i++)
+                        {
+                            var p = plans[i];
+                            html+="<tr><th>"+(i+1)+"</th>"
+                                    +"<td>" + p.program_name + "</td>"
+                                    +"<td>" + p.rest_count + "</td>"
+                                    +"<td><input type=\"number\" class=\"form-control\" name=\"consume_count"+ p.id +"\" value=0></tr>";
+                        }
+                        $("#count-consuming tbody").html(html);
+                    }
+                    else{
+                        alert("卡号：" + card_id + "不存在，请重新输入");
+                    }
+                }
+            });
+        }
+    });
+    //增加<tr/>
+    $("#addbtn").click(function(){
+        var _len = $("#tab tbody tr").length + 1;
+        var select_programs_html = "";
+        var select_employees_html = "";
+        for(var i=0; i < programs.length; i++)
+        {
+            select_programs_html += "<option>"+programs[i].name+" | "+programs[i].price+"</option>";
+        }
+        for(var i=0; i < employees.length; i++)
+        {
+            select_employees_html += "<option>"+employees[i].name+" | "+employees[i].code+"</option>";
+        }
+
+        $("#tab tbody").append("<tr id="+_len+" align=\"center\">"
+            +"<th>"+_len+"</th>"
+            +"<td><select name=\"program"+_len+"\" id=\"program"+_len
+                +"\"class=\"form-control\">"+select_programs_html+"</select>"+"</td>"
+            +"<td><input type=\"text\" name=\"price"+_len+"\" id=\"price"+_len
+                +"\" value=\"20.0\" class=\"form-control\"></td>"
+            +"<td><input type=\"number\" name=\"count"+_len+"\" id=\"count"+_len
+                +"\" value=\"1\" class=\"form-control\"></td>"
+            +"<td><select name=\"employee"+_len+"\" id=\"employee"+_len
+                +"\" class=\"form-control\">"+select_employees_html+"</select>"+"</td>"
+            +"<td><a href=\"#\" onclick=\"deltr("+_len+")\">删除</a></td>"
+            +"</tr>");
+    });
+
+    $("#vip-addbtn").click(function(){
+        var _len = $("#vip-tab tbody tr").length + 1;
+        var select_programs_html = "";
+        var select_employees_html = "";
+        for(var i=0; i < programs.length; i++)
+        {
+            select_programs_html += "<option>"+programs[i].name+" | "+programs[i].price+"</option>";
+        }
+        for(var i=0; i < employees.length; i++)
+        {
+            select_employees_html += "<option>"+employees[i].name+" | "+employees[i].code+"</option>";
+        }
+
+        $("#vip-tab tbody").append("<tr id=\"vip-"+_len+"\" align=\"center\">"
+            +"<th>"+_len+"</th>"
+            +"<td><select name=\"vip_program"+_len+"\" id=\"vip-program"+_len
+                +"\"class=\"form-control\">"+select_programs_html+"</select>"+"</td>"
+            +"<td><input type=\"text\" name=\"vip_price"+_len+"\" id=\"vip-price"+_len
+                +"\" value=\"20.0\" class=\"form-control\"></td>"
+            +"<td><input type=\"number\" name=\"vip_count"+_len+"\" id=\"vip-count"+_len
+                +"\" value=\"1\" class=\"form-control\"></td>"
+            +"<td><select name=\"vip_employee"+_len+"\" id=\"vip-employee"+_len
+                +"\" class=\"form-control\">"+select_employees_html+"</select>"+"</td>"
+            +"<td><a href=\"#\" onclick=\"vip_deltr("+_len+")\">删除</a></td>"
+            +"</tr>");
+    });
+});
+
+//删除<tr/>
+var deltr =function(index){
+       var _len = $("#tab tbody tr").length;
+
+       $("tr[id='"+index+"']").remove();//删除当前行
+        var select_programs_html = "";
+        var select_employees_html = "";
+        for(var i=0; i < programs.length; i++)
+        {
+            select_programs_html += "<option>"+programs[i].name+" | "+programs[i].price+"</option>";
+        }
+        for(var i=0; i < employees.length; i++)
+        {
+            select_employees_html += "<option>"+employees[i].name+" | "+employees[i].code+"</option>";
+        }
+       for(var i=index+1,j=_len;i<=j;i++)
+       {
+           var program = $("#program"+i).val();
+           var price = $("#price"+i).val();
+           var count = $("#count"+i).val();
+           var employee = $("#employee"+i).val();
+           if(!program){
+               console.log(i+","+$("tr[id='"+i+"']").html());
+           }
+           var new_html = "<tr id="+(i-1)+" align=\"center\">"
+                +"<th>"+(i-1)+"</th>"
+                +"<td><select name=\"program"+(i-1)+"\" id=\"program"+(i-1)
+                   +"\" value=\""+program+"\" class=\"form-control\">"+select_programs_html+"</select>"+"</td>"
+                +"<td><input type=\"text\" name=\"price"+(i-1)+"\" id=\"price"+(i-1)
+                   +"\" value=\""+price+"\"class=\"form-control\"></td>"
+                +"<td><input type=\"number\" name=\"count"+(i-1)+"\" id=\"count"+(i-1)
+                   +"\" value=\""+count+"\" class=\"form-control\"></td>"
+                +"<td><select name=\"employee"+(i-1)+"\" id=\"employee"+(i-1)
+                   +"\" value=\""+employee+"\" class=\"form-control\">"+select_employees_html+"</select>"+"</td>"
+                +"<td><a href=\'#\' onclick=\'deltr("+(i-1)+")\'>删除</a></td>"
+                +"</tr>";
+           console.log("new\n"+new_html);
+           $("tr[id=\'"+i+"\']")
+               .replaceWith(new_html);
+       }
+
+};
+
+var vip_deltr =function(index){
+       var _len = $("#vip-tab tbody tr").length;
+
+       $("tr[id='vip-"+index+"']").remove();//删除当前行
+        var select_programs_html = "";
+        var select_employees_html = "";
+        for(var i=0; i < programs.length; i++)
+        {
+            select_programs_html += "<option>"+programs[i].name+" | "+programs[i].price+"</option>";
+        }
+        for(var i=0; i < employees.length; i++)
+        {
+            select_employees_html += "<option>"+employees[i].name+" | "+employees[i].code+"</option>";
+        }
+       for(var i=index+1,j=_len;i<=j;i++)
+       {
+           var program = $("#vip-program"+i).val();
+           var price = $("#vip-price"+i).val();
+           var count = $("#vip-count"+i).val();
+           var employee = $("#vip-employee"+i).val();
+           var new_html = "<tr id=\"vip-"+(i-1)+"\" align=\"center\">"
+                +"<th>"+(i-1)+"</th>"
+                +"<td><select name=\"vip_program"+(i-1)+"\" id=\"vip-program"+(i-1)
+                   +"\" value=\""+program+"\" class=\"form-control\">"+select_programs_html+"</select>"+"</td>"
+                +"<td><input type=\"text\" name=\"vip_price"+(i-1)+"\" id=\"vip-price"+(i-1)
+                   +"\" value=\""+price+"\"class=\"form-control\"></td>"
+                +"<td><input type=\"number\" name=\"vip_count"+(i-1)+"\" id=\"vip-count"+(i-1)
+                   +"\" value=\""+count+"\" class=\"form-control\"></td>"
+                +"<td><select name=\"vip_employee"+(i-1)+"\" id=\"vip-employee"+(i-1)
+                   +"\" value=\""+employee+"\" class=\"form-control\">"+select_employees_html+"</select>"+"</td>"
+                +"<td><a href=\'#\' onclick=\'vip_deltr("+(i-1)+")\'>删除</a></td>"
+                +"</tr>";
+           console.log(new_html);
+           $("tr[id=\'vip-"+i+"\']")
+               .replaceWith(new_html);
+       }
+
+};
+
+function getdata(){
+    $.ajax({
+        type:"GET",
+        url:"api/employees",
+        dataType:"json",
+        success: function(data){
+            employees = data.data
+        }
+    })
+    $.ajax({
+        type:"GET",
+        url:"api/programs",
+        dataType:"json",
+        success: function(data){
+            programs = data.data
+        }
+    })
+}
+</script>
+{% endblock %}

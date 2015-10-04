@@ -1,0 +1,80 @@
+{% extends "bootstrap/base.html" %}
+
+{% block styles %}
+    <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block title %} Home {% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle"
+                data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">英子造型</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+
+                <li ><a href="{{ url_for('main.consume') }}">消费 <span class="sr-only">(current)</span></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">办卡与充值<span class="caret"></span> </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('main.add_vip') }}">新建会员</a></li>
+                        <li><a href="{{ url_for('main.vip_list') }}">会员查询</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="{{ url_for('main.recharge') }}">充值</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">今日统计</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">其他 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('main.employee_manage') }}">理发师管理</a></li>
+                        <li><a href="{{ url_for('main.program_manage') }}">消费项目管理</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="{{ url_for('main.log') }}">查看日志</a></li>
+                        <li><a href="{{ url_for('main.record') }}">历史操作记录</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">管理员</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <form class="navbar-form navbar-left" role="search" action="/">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="会员卡号" name="card_id" id="card_id">
+                </div>
+                <button type="submit" class="btn btn-default">查找</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message | safe }}
+    </div>
+    {% endfor %}
+
+    {% block page_content %}
+    <div class="page-header">
+        <h1>Hello, Welcome!</h1>
+    </div>
+    {% endblock %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+{% endblock %}
