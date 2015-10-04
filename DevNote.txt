@@ -1,0 +1,2 @@
+1. plancounting类中的cardid引用的值统一设置为vip.cardid
+2. 设置program.name为不可重复的，唯一值
